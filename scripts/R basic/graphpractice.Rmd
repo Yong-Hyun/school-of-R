@@ -1,0 +1,146 @@
+---
+title: "GraphPractice"
+author: "Yong-Hyun Lim"
+date: "2014년 8월 11일"
+output: html_document
+---
+
+## 정규분포
+
+* 확률분포의 밀도 함수를 그려보자.
+* R의 기본 그래픽 툴로 가능하다. 
+```{r}
+x <- seq(from=-3, to=+3, length.out=100)
+plot(x, dnorm(x))
+# 그러나 정규분포는 연속확률분포이기 때문에 plot함수에 type="l" 인자를 써줘야 한다.
+plot(x, dnorm(x), type="l")
+# 이제 length.out을 조작해 보자. =10
+x <- seq(from=-3, to=+3, length.out=10)
+plot(x, dnorm(x), type="l")
+# 이제 length.out을 조작해 보자. =5
+x <- seq(from=-3, to=+3, length.out=5)
+plot(x, dnorm(x), type="l")
+# 이제 length.out을 조작해 보자. =4
+x <- seq(from=-3, to=+3, length.out=4)
+plot(x, dnorm(x), type="l")
+# 이제 length.out을 조작해 보자. =3
+x <- seq(from=-3, to=+3, length.out=3)
+plot(x, dnorm(x), type="l")
+```
+즉 length.out은 분포에서 표집된 수를 나타낸다. 사례수가 많아질수록 분포는 점점 곡선이 된다. 
+
+x의 범위를 달리하여 표준 정규 분포 그래프를 그려보자.
+```{r}
+x <- seq(from=-3, to=+3, length.out=100)
+y <- dnorm(x)
+plot(x,y, main="Standard Normal Distribution", type="l", ylab="Density", xlab="Quantaile")
+abline(h=0)
+# 표준정규분포에 영역을 선택해 보자.
+# 이제 필요한 부분을 연속된 선분으로 정의한다. 
+# 선분들은 각가(x, y)좌표들의 연속으로 정의된다. 그러면 polygon함수는 가장 처음과 끝(x,y) 점들을 연결해 다각형으로 닫아준다. 
+
+#다각형 본체는 1 <= z <= 2인 밀도곡선을 따른다. 
+region.x <- x[1 <= x & x <= 2]
+region.y <- y[1 <= x & x <= 2]
+
+# Y축까지 내려오는 처음과 마지막 선분을 추가한다. 
+region.x <- c(region.x[1], region.x, tail(region.x,1))
+region.y <- c(0, region.y, 0)
+
+#마지막으로 polygon을 호출해 해당 구역의 경계를 그린 뒤 안을 채우면 끝
+polygon(region.x, region.y, density=10) # density=10은 45도 각도의 사선으로 안을 채움
+
+# 선이 아닌 색상으로 채우려면 density=-1로 설정하고 col을 원하는 색상으로 하면됨.
+polygon(region.x, region.y, density=-1, col="red")
+```
+마지막에 구역 그리기는 나도 좀 어렵네...
+
+
+##산점도 그리기
+
+내장함수인 cars데이터를 이용하여 산점도를 그려보자.cars데이터는 어떤 모양을 하고 있는지 확인하고 그 데이터에 대한 산점도를 그려보자. 
+
+```{r}
+summary(cars)
+head(cars, 5) # cars데이터의 앞부분 5행 정도를 확인한다.
+tail(cars, 5) # cars데이터의 끝부분 5행 정도를 확인한다.
+plot(cars) # cars데이터의 산점도를 그린다.
+```
+
+제목과 라벨을 추가하기
+```{r}
+plot(cars, 
+     main="cars: Speed vs. Stopping Distance(1920)", # 그래프 제목
+     xlab="Speed (MPH)",   # x축의 제목
+     ylab="Stopping Distance(ft)")  # y축의 제목
+```
+기본 설정보다 확실히 나아졌다. 제목을 통해 그 그래프가 무엇을 의미하는지를, 라벨로는 척도를 알 수 있게 되었다. 
+
+
+###격자 추가하기
+
+이제 그래프 속에 격자를 추가해 보자. 
+```{r}
+plot(cars, 
+     main="cars: Speed vs. Stopping Distance(1920)", # 그래프 제목
+     xlab="Speed (MPH)",   # x축의 제목
+     ylab="Stopping Distance(ft)",  # y축의 제목
+     type="n")  # 제목과 축들을 포함해 새로운 그래프를 생성
+grid() # 격자를 그린다.
+points(cars)  # 저수준 그래픽 함수인 points를 호출하여 산점도를 그린다. 
+```
+
+plot다음에 grid를 호출해도 가능하지만 격자가 그래프 위에 덮여 부분적으로 가려지는 문제가 있을 수 있다. 따라서 위의 방법을 사용하자. 
+
+#### 여러 집단의 산점도 생성하기
+
+대응 관측들이 두 개의 벡터, x와 y에 담겨 있고 상응 요인(parallel factor) f가 그들의 집단을 나타낸다. 집단들을 구별하는 x와 y의 산점도를 만들고 싶다. 
+plot의 pch인자를 사용하면 가능하다. iris데이터를 이용한다. 
+```{r}
+# 도표를 그리기 전에 데이터의 구조를 확인하자.
+head(iris, 5)
+tail(iris, 5)
+names(iris) # 데이터 변수명을 확인
+# edit(iris) # 데이터를 편집할 수 있는 명령. 데이터에 문제가 있어 수정하고 싶다면 이 명령을 사용.
+with(iris, plot(Petal.Length, Petal.Width))  # 산점도는 이렇게 그릴 수 있지만
+# plot(iris$Petal.Length, iris$Petal.Width)  # 이렇게 그릴 수도 있다. 
+```
+그러나 이 도표에는 집단이 구분되어 있지 않아 아무런 의미를 발견할 수 없다.
+따라서 집단을 구분해 줄 필요가 있다. 
+
+```{r}
+with(iris, plot(Petal.Length, Petal.Width, pch=as.integer(Species)))
+```
+pch=as.integer()인자를 이용하면 된다. 
+
+
+#### 범례를 추가하기
+그래프 안에 범례, 즉 그래픽의 내용을 해독할 수 있게 해주는 작은 박스를 넣는다. 
+plot을 호출한 다음 legend 함수를 호출한다. 
+
+* 점 범례
+    + legend(x,y, labels, pch=c(선유형1, 선유형2,...))
+    + 여기서 x와 y는 범례박스의 좌표, labels는 범례에 나타날 문자열 벡터이다.
+* 선 유형에 따른 범례
+    + legend(x,y, labels, lty=c(선유형1, 선유형2,...))
+* 선의 두께에 따른 범례
+    + legend(x,y, labels, lwd=c(선유형1, 선유형2,...))
+* 색상에 따른 범례
+    + legend(x,y, labels, col=c(선유형1, 선유형2,...))
+```{r}
+with(iris, plot(Petal.Length, Petal.Width, pch=as.integer(Species)))
+legend(1.5, 2.4, c("setosa", "versicolor", "virginica"), pch=1:3)
+```
+legend함수는 plot을 호출한 후 사용할 수 있다. 
+
+품종의 이름을 R코드로 입력하지 않고 그리는 방법을 알아보자. 
+```{r}
+f <- factor(iris$Species) # 요인변수를 지정하고 그것을 f에 저장한다.
+with(iris, plot(Petal.Length, Petal.Width, pch=as.integer(f))) # 집단별로 구분된 산점도를 그린다.
+legend(1.5, 2.4, as.character(levels(f)), pch=1:length(levels(f))) # 점범례를 그린다.
+```
+
+as.character(levels(f))는 수준이 3개인 문자형 벡터라는 의미이다. 그리고 pch=1:length(levels(f))는 수준이 1에서 f의 끝부분까지라는 의미이다. 
+
+
+

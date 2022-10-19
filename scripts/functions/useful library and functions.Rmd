@@ -1,0 +1,52 @@
+---
+title: "useful functions"
+author: "Lim Yong-Hyun"
+date: '2022 6 29 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 유용한 함수들
+
+## format and Sys.time
+
++ `format()`과 `Sys.time()`을 이용하면 현재 날짜를 저장 가능
++ 데이터 저장시 날짜를 표시할 때 사용
++ R base function
+```{r}
+
+prac_format <- format(Sys.time(), "%y%m%d%H%M")
+print(prac_format)
+
+```
+
+## ifelse 함수
++ '만약~이 아니면, 다음 명령을 수행하라'는 명제를 수행할 경우
++ 작업디렉토리가 제시한 것과 같지 않다면, SNSB라는 단어가 들어간 파일들의 파일명을 리스트로 만들라
++ 마크다운에서 작업디렉토리 설정하는 것이 콘솔에서 설정하는 것과 일치되지 않아서 사용
+```{r}
+
+wd <- getwd()
+
+ifelse(!wd == "C:/Users/jangg/Dropbox/DellWorks/Doc/Rprojects/Dementia_AR_Training", ls_snsb <- list.files(path="../", recursive=TRUE, pattern="^[SNSB]"))
+
+```
+
+## Dementia_AR_Training에서 사용하려다 폐기
++ 이후 삭제해도 무방
++ 위에 if else와 겹침
+```{r}
+wd <- getwd()
+td <- format(Sys.time(), "%y%m%d%H%M")
+# "C:/Users/jangg/Dropbox/DellWorks/Doc/Rprojects/Dementia_AR_Training"
+
+ifelse(!wd == "C:/Users/jangg/Dropbox/DellWorks/Doc/Rprojects/Dementia_AR_Training", ls_snsb <- list.files(path="../", recursive=TRUE, pattern="^[SNSB]"))
+
+
+setwd("C:/Users/jangg/Dropbox/DellWorks/Doc/Rprojects/Dementia_AR_Training")
+
+```
+
